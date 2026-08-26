@@ -69,11 +69,12 @@ function Dashboard() {
               </Space>
               <Statistic
                 value={k.value}
-                precision={k.precision}
-                prefix={k.prefix}
-                suffix={k.suffix}
+                {...(k.precision !== undefined ? { precision: k.precision } : {})}
+                {...(k.prefix ? { prefix: k.prefix } : {})}
+                {...(k.suffix ? { suffix: k.suffix } : {})}
                 valueStyle={{ fontSize: 24, fontWeight: 600 }}
               />
+
               <Typography.Text
                 type={k.delta >= 0 ? "success" : "danger"}
                 style={{ fontSize: 12 }}
