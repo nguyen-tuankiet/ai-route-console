@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   Layout,
@@ -22,7 +22,6 @@ import {
   DeploymentUnitOutlined,
   BranchesOutlined,
   KeyOutlined,
-  BarChartOutlined,
   FileSearchOutlined,
   ThunderboltOutlined,
   PictureOutlined,
@@ -40,17 +39,16 @@ const { Sider, Header, Content } = Layout;
 
 export const navItems = [
   { key: "/", icon: <DashboardOutlined />, label: "Tổng quan" },
-  { key: "/providers", icon: <CloudServerOutlined />, label: "Providers" },
+  { key: "/providers", icon: <CloudServerOutlined />, label: "Nhà cung cấp" },
   { key: "/accounts", icon: <TeamOutlined />, label: "Tài khoản Provider" },
-  { key: "/models", icon: <DeploymentUnitOutlined />, label: "Models" },
+  { key: "/models", icon: <DeploymentUnitOutlined />, label: "Model" },
   { key: "/routing", icon: <BranchesOutlined />, label: "Chính sách định tuyến" },
-  { key: "/api-keys", icon: <KeyOutlined />, label: "API Keys" },
-  { key: "/usage", icon: <BarChartOutlined />, label: "Usage & Analytics" },
-  { key: "/logs", icon: <FileSearchOutlined />, label: "Request Logs" },
-  { key: "/jobs", icon: <ThunderboltOutlined />, label: "Async Jobs" },
-  { key: "/assets", icon: <PictureOutlined />, label: "Assets" },
-  { key: "/audit", icon: <SafetyCertificateOutlined />, label: "Audit Logs" },
-  { key: "/health", icon: <HeartOutlined />, label: "System Health" },
+  { key: "/api-keys", icon: <KeyOutlined />, label: "API Key" },
+  { key: "/logs", icon: <FileSearchOutlined />, label: "Nhật ký Request" },
+  { key: "/jobs", icon: <ThunderboltOutlined />, label: "Tác vụ bất đồng bộ" },
+  { key: "/assets", icon: <PictureOutlined />, label: "Asset" },
+  { key: "/audit", icon: <SafetyCertificateOutlined />, label: "Nhật ký kiểm toán" },
+  { key: "/health", icon: <HeartOutlined />, label: "Tình trạng hệ thống" },
 ];
 
 const labelOf = (path: string) =>
@@ -95,8 +93,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             top: 0,
             height: "100vh",
             overflow: "auto",
-            display: "flex",
-            flexDirection: "column",
           }}
         >
           <div
@@ -143,38 +139,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             items={navItems}
             onClick={({ key }) => navigate({ to: key })}
           />
-
-          <div
-            style={{
-              marginTop: "auto",
-              borderTop: "1px solid #e5e7eb",
-              padding: 12,
-              position: "sticky",
-              bottom: 0,
-              background: "#fff",
-            }}
-          >
-            <Space align="center" style={{ marginBottom: 8 }}>
-              <Avatar size={32} style={{ background: "#1677ff" }}>
-                A
-              </Avatar>
-              {!collapsed && (
-                <div style={{ lineHeight: 1.25 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500 }}>Admin</div>
-                  <div style={{ fontSize: 11, color: "#8c8c8c" }}>admin@corp.io</div>
-                </div>
-              )}
-            </Space>
-            <Menu
-              mode="inline"
-              selectable={false}
-              style={{ borderInlineEnd: "none" }}
-              items={[
-                { key: "settings", icon: <SettingOutlined />, label: "Cài đặt" },
-                { key: "logout", icon: <LogoutOutlined />, label: "Đăng xuất", danger: true },
-              ]}
-            />
-          </div>
         </Sider>
 
         <Layout>
@@ -213,9 +177,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
               defaultValue="production"
               style={{ width: 150 }}
               options={[
-                { value: "development", label: "Development" },
-                { value: "staging", label: "Staging" },
-                { value: "production", label: "Production" },
+                { value: "development", label: "Phát triển" },
+                { value: "staging", label: "Kiểm thử" },
+                { value: "production", label: "Chính thức" },
               ]}
             />
             <Badge count={3} size="small">

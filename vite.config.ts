@@ -12,4 +12,12 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      // Vite's dev server rejects requests whose Host header isn't recognized (anti DNS-rebinding).
+      // A Cloudflare quick tunnel (trycloudflare.com) forwards the real Host header through, and
+      // its subdomain is random per tunnel run, so allow the whole domain rather than one hostname.
+      allowedHosts: [".trycloudflare.com"],
+    },
+  },
 });

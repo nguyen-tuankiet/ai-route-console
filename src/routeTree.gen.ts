@@ -11,7 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as ApiKeysRouteImport } from './routes/api-keys'
+import { Route as AssetsRouteImport } from './routes/assets'
+import { Route as AuditRouteImport } from './routes/audit'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as ProvidersRouteImport } from './routes/providers'
+import { Route as RoutingRouteImport } from './routes/routing'
+import { Route as JobsIndexRouteImport } from './routes/jobs.index'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
+import { Route as LogsIndexRouteImport } from './routes/logs.index'
+import { Route as LogsIdRouteImport } from './routes/logs.$id'
+import { Route as ModelsIndexRouteImport } from './routes/models.index'
+import { Route as ModelsAliasRouteImport } from './routes/models.$alias'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +34,182 @@ const AccountsRoute = AccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiKeysRoute = ApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssetsRoute = AssetsRouteImport.update({
+  id: '/assets',
+  path: '/assets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuditRoute = AuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProvidersRoute = ProvidersRouteImport.update({
   id: '/providers',
   path: '/providers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoutingRoute = RoutingRouteImport.update({
+  id: '/routing',
+  path: '/routing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIndexRoute = JobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogsIndexRoute = LogsIndexRouteImport.update({
+  id: '/logs/',
+  path: '/logs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogsIdRoute = LogsIdRouteImport.update({
+  id: '/logs/$id',
+  path: '/logs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsIndexRoute = ModelsIndexRouteImport.update({
+  id: '/models/',
+  path: '/models/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsAliasRoute = ModelsAliasRouteImport.update({
+  id: '/models/$alias',
+  path: '/models/$alias',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
+  '/api-keys': typeof ApiKeysRoute
+  '/assets': typeof AssetsRoute
+  '/audit': typeof AuditRoute
+  '/health': typeof HealthRoute
   '/providers': typeof ProvidersRoute
+  '/routing': typeof RoutingRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/logs/$id': typeof LogsIdRoute
+  '/models/$alias': typeof ModelsAliasRoute
+  '/jobs/': typeof JobsIndexRoute
+  '/logs/': typeof LogsIndexRoute
+  '/models/': typeof ModelsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
+  '/api-keys': typeof ApiKeysRoute
+  '/assets': typeof AssetsRoute
+  '/audit': typeof AuditRoute
+  '/health': typeof HealthRoute
   '/providers': typeof ProvidersRoute
+  '/routing': typeof RoutingRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/logs/$id': typeof LogsIdRoute
+  '/models/$alias': typeof ModelsAliasRoute
+  '/jobs': typeof JobsIndexRoute
+  '/logs': typeof LogsIndexRoute
+  '/models': typeof ModelsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
+  '/api-keys': typeof ApiKeysRoute
+  '/assets': typeof AssetsRoute
+  '/audit': typeof AuditRoute
+  '/health': typeof HealthRoute
   '/providers': typeof ProvidersRoute
+  '/routing': typeof RoutingRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/logs/$id': typeof LogsIdRoute
+  '/models/$alias': typeof ModelsAliasRoute
+  '/jobs/': typeof JobsIndexRoute
+  '/logs/': typeof LogsIndexRoute
+  '/models/': typeof ModelsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/accounts' | '/providers'
+  fullPaths:
+    | '/'
+    | '/accounts'
+    | '/api-keys'
+    | '/assets'
+    | '/audit'
+    | '/health'
+    | '/providers'
+    | '/routing'
+    | '/jobs/$id'
+    | '/logs/$id'
+    | '/models/$alias'
+    | '/jobs/'
+    | '/logs/'
+    | '/models/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/accounts' | '/providers'
-  id: '__root__' | '/' | '/accounts' | '/providers'
+  to:
+    | '/'
+    | '/accounts'
+    | '/api-keys'
+    | '/assets'
+    | '/audit'
+    | '/health'
+    | '/providers'
+    | '/routing'
+    | '/jobs/$id'
+    | '/logs/$id'
+    | '/models/$alias'
+    | '/jobs'
+    | '/logs'
+    | '/models'
+  id:
+    | '__root__'
+    | '/'
+    | '/accounts'
+    | '/api-keys'
+    | '/assets'
+    | '/audit'
+    | '/health'
+    | '/providers'
+    | '/routing'
+    | '/jobs/$id'
+    | '/logs/$id'
+    | '/models/$alias'
+    | '/jobs/'
+    | '/logs/'
+    | '/models/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
+  ApiKeysRoute: typeof ApiKeysRoute
+  AssetsRoute: typeof AssetsRoute
+  AuditRoute: typeof AuditRoute
+  HealthRoute: typeof HealthRoute
   ProvidersRoute: typeof ProvidersRoute
+  RoutingRoute: typeof RoutingRoute
+  JobsIdRoute: typeof JobsIdRoute
+  LogsIdRoute: typeof LogsIdRoute
+  ModelsAliasRoute: typeof ModelsAliasRoute
+  JobsIndexRoute: typeof JobsIndexRoute
+  LogsIndexRoute: typeof LogsIndexRoute
+  ModelsIndexRoute: typeof ModelsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +228,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api-keys': {
+      id: '/api-keys'
+      path: '/api-keys'
+      fullPath: '/api-keys'
+      preLoaderRoute: typeof ApiKeysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assets': {
+      id: '/assets'
+      path: '/assets'
+      fullPath: '/assets'
+      preLoaderRoute: typeof AssetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/audit': {
+      id: '/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/providers': {
       id: '/providers'
       path: '/providers'
       fullPath: '/providers'
       preLoaderRoute: typeof ProvidersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/routing': {
+      id: '/routing'
+      path: '/routing'
+      fullPath: '/routing'
+      preLoaderRoute: typeof RoutingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/': {
+      id: '/jobs/'
+      path: '/jobs'
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logs/': {
+      id: '/logs/'
+      path: '/logs'
+      fullPath: '/logs/'
+      preLoaderRoute: typeof LogsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logs/$id': {
+      id: '/logs/$id'
+      path: '/logs/$id'
+      fullPath: '/logs/$id'
+      preLoaderRoute: typeof LogsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models/': {
+      id: '/models/'
+      path: '/models'
+      fullPath: '/models/'
+      preLoaderRoute: typeof ModelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models/$alias': {
+      id: '/models/$alias'
+      path: '/models/$alias'
+      fullPath: '/models/$alias'
+      preLoaderRoute: typeof ModelsAliasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +318,18 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
+  ApiKeysRoute: ApiKeysRoute,
+  AssetsRoute: AssetsRoute,
+  AuditRoute: AuditRoute,
+  HealthRoute: HealthRoute,
   ProvidersRoute: ProvidersRoute,
+  RoutingRoute: RoutingRoute,
+  JobsIdRoute: JobsIdRoute,
+  LogsIdRoute: LogsIdRoute,
+  ModelsAliasRoute: ModelsAliasRoute,
+  JobsIndexRoute: JobsIndexRoute,
+  LogsIndexRoute: LogsIndexRoute,
+  ModelsIndexRoute: ModelsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

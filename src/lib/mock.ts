@@ -1,3 +1,8 @@
+/** `arr[i % arr.length]` under `noUncheckedIndexedAccess` — the modulo guarantees an in-bounds index. */
+function pick<T>(arr: readonly T[], i: number): T {
+  return arr[i % arr.length] as T;
+}
+
 export type Health = "Healthy" | "Degraded" | "Quota Exhausted" | "Disabled";
 
 export const healthColor: Record<string, string> = {
@@ -360,13 +365,23 @@ export const requestLogs = Array.from({ length: 24 }, (_, i) => ({
 export const jobs = Array.from({ length: 18 }, (_, i) => ({
   key: String(i),
   id: `job_${(0x51a0 + i * 37).toString(16)}`,
-  type: (["Video", "Music", "Image"] as const)[i % 3],
-  model: ["video/standard", "audio/music", "image/quality"][i % 3],
-  client: ["media-pipeline", "studio-app"][i % 2],
-  status: (
-    ["Running", "Succeeded", "Queued", "Failed", "Accepted", "Dispatching", "Cancelled", "Expired"] as const
-  )[i % 8],
-  progress: [62, 100, 0, 34, 5, 12, 48, 80][i % 8],
+  type: pick(["Video", "Music", "Image"] as const, i),
+  model: pick(["video/standard", "audio/music", "image/quality"], i),
+  client: pick(["media-pipeline", "studio-app"], i),
+  status: pick(
+    [
+      "Running",
+      "Succeeded",
+      "Queued",
+      "Failed",
+      "Accepted",
+      "Dispatching",
+      "Cancelled",
+      "Expired",
+    ] as const,
+    i,
+  ),
+  progress: pick([62, 100, 0, 34, 5, 12, 48, 80], i),
   attempts: (i % 2) + 1,
   created: `2026-08-26 0${i % 3}:12:0${i % 9}`,
   updated: `2026-08-26 0${(i % 3) + 1}:44:1${i % 9}`,
@@ -375,12 +390,12 @@ export const jobs = Array.from({ length: 18 }, (_, i) => ({
 export const assets = Array.from({ length: 12 }, (_, i) => ({
   key: String(i),
   id: `asset_${(0xa10 + i * 11).toString(16)}`,
-  type: (["Image", "Video", "Audio"] as const)[i % 3],
-  mime: ["image/png", "video/mp4", "audio/mpeg"][i % 3],
+  type: pick(["Image", "Video", "Audio"] as const, i),
+  mime: pick(["image/png", "video/mp4", "audio/mpeg"], i),
   size: `${(0.6 + i * 0.42).toFixed(1)} MB`,
   created: `2026-08-2${(i % 6) + 1} 11:0${i % 9}`,
   expires: `2026-09-2${(i % 6) + 1}`,
-  client: ["media-pipeline", "studio-app"][i % 2],
+  client: pick(["media-pipeline", "studio-app"], i),
 }));
 
 export const auditLogs = Array.from({ length: 14 }, (_, i) => ({
@@ -394,7 +409,12 @@ export const auditLogs = Array.from({ length: 14 }, (_, i) => ({
     "Revoked API Key",
     "Disabled Provider Account",
   ][i % 6],
-  resource: ["provider:openai", "model:text/fast", "apikey:air_live_77Zx…", "account:openai-prod-02"][i % 4],
+  resource: [
+    "provider:openai",
+    "model:text/fast",
+    "apikey:air_live_77Zx…",
+    "account:openai-prod-02",
+  ][i % 4],
   result: i % 9 === 4 ? "Denied" : "Success",
   ip: `10.24.${i % 5}.${20 + i}`,
   timestamp: `2026-08-2${(i % 6) + 1} 14:${String(59 - i).padStart(2, "0")}:03`,
@@ -420,3 +440,122 @@ export const usageRows = Array.from({ length: 16 }, (_, i) => ({
   requests: 8200 + i * 240,
   cost: (120.4 + i * 13.7).toFixed(2),
 }));
+
+// ---------------------------------------------------------------------------
+// Usage & Analytics — chart series (README §11)
+// ---------------------------------------------------------------------------
+
+export const successFailedTrend = trendData.map((d) => ({
+  time: d.time,
+  success: d.requests - d.failed,
+  failed: d.failed,
+}));
+
+export const providerDistribution = [
+  { type: "OpenAI Compatible", value: 52 },
+  { type: "Vertex AI", value: 31 },
+  { type: "Native Audio", value: 12 },
+  { type: "Partner OAuth Gateway", value: 5 },
+];
+
+export const tokenUsageTrend = Array.from({ length: 14 }, (_, i) => ({
+  date: `08-${String(13 + i).padStart(2, "0")}`,
+  input: 900000 + i * 42000 + Math.round(Math.sin(i / 2) * 60000),
+  output: 320000 + i * 15000 + Math.round(Math.cos(i / 2) * 20000),
+}));
+
+export const costTrend = Array.from({ length: 14 }, (_, i) => ({
+  date: `08-${String(13 + i).padStart(2, "0")}`,
+  cost: Number((180 + i * 21.4 + Math.sin(i / 3) * 30).toFixed(2)),
+}));
+
+export const latencyTrend = Array.from({ length: 24 }, (_, i) => ({
+  time: `${String(i).padStart(2, "0")}:00`,
+  avg: 620 + Math.round(Math.sin(i / 4) * 180),
+  p95: 1800 + Math.round(Math.cos(i / 3) * 420),
+}));
+
+export const fallbackRateTrend = Array.from({ length: 14 }, (_, i) => ({
+  date: `08-${String(13 + i).padStart(2, "0")}`,
+  rate: Number((1.4 + Math.abs(Math.sin(i / 2)) * 2.1).toFixed(2)),
+}));
+
+// ---------------------------------------------------------------------------
+// Request Logs / Request Detail (README §12–13)
+// ---------------------------------------------------------------------------
+
+const REQUEST_PROVIDERS = ["OpenAI Compatible", "Vertex AI", "Native Audio"] as const;
+const OUTCOMES = ["timeout", "rate_limit", "provider_5xx", "success"] as const;
+
+/** Deterministic pseudo-hash so the same request id always renders the same attempt timeline. */
+function seedOf(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+export function getRequestDetail(id: string) {
+  const seed = seedOf(id);
+  const row = requestLogs.find((r) => r.id === id);
+  const attemptCount = row?.attempts ?? (seed % 3) + 1;
+  const finalSucceeded = row ? row.status === "Success" : seed % 7 !== 5;
+
+  const attempts = Array.from({ length: attemptCount }, (_, i) => {
+    const isLast = i === attemptCount - 1;
+    const outcome = isLast && finalSucceeded ? "success" : pick(OUTCOMES, seed + i);
+    const duration = 300 + ((seed >> (i + 1)) % 2200);
+    return {
+      attempt_no: i + 1,
+      provider: pick(REQUEST_PROVIDERS, seed + i),
+      outcome,
+      duration,
+    };
+  });
+
+  return {
+    id,
+    client: row?.client ?? "internal-chat-service",
+    alias: row?.alias ?? "text/fast",
+    capability: row?.capability ?? "Text Generation",
+    result: finalSucceeded ? "Success" : "Failed",
+    duration: row?.duration ?? attempts.reduce((s, a) => s + a.duration, 0),
+    inputTokens: row?.inputTokens ?? 400 + (seed % 900),
+    outputTokens: row?.outputTokens ?? 120 + (seed % 400),
+    cost: row?.cost ?? (0.0008 * ((seed % 50) + 1)).toFixed(4),
+    attempts,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Async Jobs — Job Detail (README §15)
+// ---------------------------------------------------------------------------
+
+const JOB_STAGES = ["Accepted", "Queued", "Dispatching", "Running", "Succeeded"] as const;
+const JOB_FAIL_STAGES: Record<string, string> = {
+  Failed: "Running",
+  Cancelled: "Dispatching",
+  Expired: "Queued",
+};
+
+export function getJobDetail(id: string) {
+  const job = jobs.find((j) => j.id === id);
+  if (!job) return null;
+
+  const isTerminalFailure = job.status in JOB_FAIL_STAGES;
+  const reachedStage = isTerminalFailure ? JOB_FAIL_STAGES[job.status] : job.status;
+  const reachedIndex = JOB_STAGES.indexOf(reachedStage as (typeof JOB_STAGES)[number]);
+  const cappedIndex = reachedIndex === -1 ? 0 : reachedIndex;
+
+  const timeline: { stage: string; at: string }[] = JOB_STAGES.slice(0, cappedIndex + 1).map(
+    (stage, i) => ({
+      stage,
+      at: `2026-08-26 0${i}:${String(12 + i * 7).padStart(2, "0")}:00`,
+    }),
+  );
+
+  if (isTerminalFailure) {
+    timeline.push({ stage: job.status, at: job.updated });
+  }
+
+  return { ...job, timeline };
+}

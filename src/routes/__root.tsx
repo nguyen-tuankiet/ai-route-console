@@ -8,11 +8,12 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { StyleProvider } from "@ant-design/cssinjs";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppLayout } from "../components/AppLayout";
-
+import { antdCache } from "../lib/antdCache";
 
 function NotFoundComponent() {
   return (
@@ -100,6 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -128,11 +130,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
+      {/* cache shared with server.ts, which extracts + injects the resulting CSS into
+          the SSR response — see antdCache.tsx for why this exists. */}
+      <StyleProvider cache={antdCache}>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      </StyleProvider>
     </QueryClientProvider>
   );
 }
-

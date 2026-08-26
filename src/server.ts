@@ -1,7 +1,9 @@
 import "./lib/error-capture";
 
+import { extractStyle } from "@ant-design/cssinjs";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { antdCache } from "./lib/antdCache";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -44,12 +46,39 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// AntD's cssinjs never touches `document` on the server, so the SSR render
+// that just happened inside handler.fetch() registered its styles into
+// antdCache but emitted zero <style> tags. Extract the accumulated CSS from
+// that same cache now and splice it into <head> so the page isn't unstyled
+// on first paint (see antdCache.tsx). `response.text()` only resolves once
+// the SSR render is fully done producing output, so the cache is guaranteed
+// populated by the time we read it here — true whether the underlying
+// response was streamed or buffered.
+async function injectAntdStyles(response: Response): Promise<Response> {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (response.status >= 300 || !contentType.includes("text/html")) return response;
+
+  const html = await response.text();
+  const css = extractStyle(antdCache, true);
+  const styled = html.includes("</head>")
+    ? html.replace("</head>", `<style data-ant-cssinjs>${css}</style></head>`)
+    : html;
+
+  const headers = new Headers(response.headers);
+  headers.delete("content-length");
+  return new Response(styled, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return await injectAntdStyles(await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
